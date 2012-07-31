@@ -8,7 +8,6 @@ The (discrete event) simulation consists of moving a population of N individuals
 #include <Rmath.h>
 #include "pqueue.h"
 #include "simulation.h"
-#include "util.h"
 
 /*states/event types*/
 #define HEALTHY 0
@@ -35,7 +34,6 @@ static struct {
 } state_statistics[STATE_COUNT];
 
 static int population_size;
-static double elapsed_time; /*per one-person simulation*/
 
 
 void simulation_init(int n)
@@ -44,7 +42,11 @@ void simulation_init(int n)
 
 	population_size = n;
 	for (i = 0; i < STATE_COUNT; i++) {
-		state_statistics[i].visit_count = 0;
+		if (i != HEALTHY) {
+			state_statistics[i].visit_count = 0;
+		} else {
+			state_statistics[i].visit_count = population_size;
+		}
 		state_statistics[i].age_sum = 0.0;
 	}
 }
@@ -83,7 +85,7 @@ static int random_gleason_level(void)
 }
 
 
-static void handle_event(int type)
+static void handle_event(int type, double t) /*handle event at time t*/
 {
 	double phr, dhr; /*hazard ratios for locally advanced and dx localised*/
 	double dtl, dtd; /*time increments for locally advanced and dx localised*/
@@ -107,18 +109,24 @@ static void handle_event(int type)
 
 		/*schedule the event that will happen first*/		
 		if (dtl > dtd) {
-			pqueue_insert(LOCALLY_ADVANCED, elapsed_time + dtl);
+			pqueue_insert(LOCALLY_ADVANCED, t + dtl);
 		} else {
-			pqueue_insert(DX_LOCALISED, elapsed_time + dtd);
+			pqueue_insert(DX_LOCALISED, t + dtd);
 		}
 
+		break;
+	case LOCALLY_ADVANCED:
+		/*do nothing*/
+		break;
+	case DX_LOCALISED:
+		/*do nothing*/
 		break;
 	case DEAD:
 		pqueue_init(); /*clear the event queue*/
 		break;
 	}
 	state_statistics[type].visit_count++;
-	state_statistics[type].age_sum += elapsed_time;
+	state_statistics[type].age_sum += t;
 	
 	assert(state_statistics[type].age_sum >= 0.0); /*overflow check*/
 }
@@ -127,16 +135,14 @@ static void handle_event(int type)
 void simulation_run(void)
 {
 	int i, type;
-	double time;
+	double t;
 
 	pqueue_init();
 	for (i = 0; i < population_size; i++) {
-		elapsed_time = 0.0;
 		schedule_initial_events();
 		while (pqueue_count() > 0) {
-			pqueue_remove(&type, &time);
-			elapsed_time += time;
-			handle_event(type);
+			pqueue_remove(&type, &t);
+			handle_event(type, t);
 		}
 	}
 }
@@ -149,14 +155,12 @@ void simulation_print(void)
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	for (i = 0; i < STATE_COUNT; i++) {
-		if (i != HEALTHY) {
-			frequency = ((double) state_statistics[i].visit_count) / ((double) population_size);
-			if (state_statistics[i].visit_count > 0) {
-				mean_age = state_statistics[i].age_sum / ((double) state_statistics[i].visit_count);
-			} else {
-				mean_age = 0.0;
-			}
-			printf("%-16s  %9.6f  %8.4f\n", state_labels[i], frequency, mean_age);
+		frequency = ((double) state_statistics[i].visit_count) / ((double) population_size);
+		if (state_statistics[i].visit_count > 0) {
+			mean_age = state_statistics[i].age_sum / ((double) state_statistics[i].visit_count);
+		} else {
+			mean_age = 0.0;
 		}
+		printf("%-16s  %9.2f  %8.2f\n", state_labels[i], frequency, mean_age);
 	}
 }
