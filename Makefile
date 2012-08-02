@@ -1,6 +1,6 @@
 #CONFIGURATION
 
-progname = gf
+progname = main
 CC = clang
 CFLAGS = -Wall -ansi -pedantic -g -DMATHLIB_STANDALONE
 LDLIBS = -lm -lRmath
