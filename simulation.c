@@ -38,16 +38,16 @@ static int population_size;
 
 void simulation_init(int n)
 {
-	int i;
+	int state;
 
 	population_size = n;
-	for (i = 0; i < STATE_COUNT; i++) {
-		if (i != HEALTHY) {
-			state_statistics[i].visit_count = 0;
+	for (state = 0; state < STATE_COUNT; state++) {
+		if (state != HEALTHY) {
+			state_statistics[state].visit_count = 0;
 		} else {
-			state_statistics[i].visit_count = population_size;
+			state_statistics[state].visit_count = population_size;
 		}
-		state_statistics[i].age_sum = 0.0;
+		state_statistics[state].age_sum = 0.0;
 	}
 }
 
@@ -134,15 +134,15 @@ static void handle_event(int type, double t) /*handle event at time t*/
 
 void simulation_run(void)
 {
-	int i, type;
-	double t;
+	int person, event_type;
+	double time;
 
 	pqueue_init();
-	for (i = 0; i < population_size; i++) {
+	for (person = 0; person < population_size; person++) {
 		schedule_initial_events();
 		while (pqueue_count() > 0) {
-			pqueue_remove(&type, &t);
-			handle_event(type, t);
+			pqueue_remove(&event_type, &time);
+			handle_event(event_type, time);
 		}
 	}
 }
@@ -150,17 +150,17 @@ void simulation_run(void)
 
 void simulation_print(void)
 {
-	int i;
+	int state;
 	double frequency, mean_age;
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
-	for (i = 0; i < STATE_COUNT; i++) {
-		frequency = ((double) state_statistics[i].visit_count) / ((double) population_size);
-		if (state_statistics[i].visit_count > 0) {
-			mean_age = state_statistics[i].age_sum / ((double) state_statistics[i].visit_count);
+	for (state = 0; state < STATE_COUNT; state++) {
+		frequency = ((double) state_statistics[state].visit_count) / ((double) population_size);
+		if (state_statistics[state].visit_count > 0) {
+			mean_age = state_statistics[state].age_sum / ((double) state_statistics[state].visit_count);
 		} else {
 			mean_age = 0.0;
 		}
-		printf("%-16s  %9.2f  %8.2f\n", state_labels[i], frequency, mean_age);
+		printf("%-16s  %9.2f  %8.2f\n", state_labels[state], frequency, mean_age);
 	}
 }
