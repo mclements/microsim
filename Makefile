@@ -1,7 +1,8 @@
 #CONFIGURATION
 
 progname = main
-CFLAGS = -Wall -DMATHLIB_STANDALONE
+CFLAGS = -Wall -DMATHLIB_STANDALONE -fopenmp
+LDFLAGS = -fopenmp
 LDLIBS = -lm -lRmath
 
 #TEMPLATE
@@ -29,7 +30,7 @@ test: $(test_binaries)
 	$(foreach test,$^,./$(test))
 
 %_test: %_test.o $(filter-out $(progname).o,$(prog_objects))
-	$(CC) $^ $(LDLIBS) -o $@
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 
 #Cleanup

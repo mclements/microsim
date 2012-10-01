@@ -29,11 +29,11 @@ const static double progression_hazard_ratios[GLEASON_LEVEL_COUNT] = {1.0, 1.387
 const static double dx_hazard_ratios[STATE_COUNT] = {-1.0, 1.1308, 0.5900, 1.2147};
 
 struct statistics {
-	int population_size;
 	struct { int visit_count; double age_sum; } states[STATE_COUNT];
 };
 
-static struct statistics statistics;
+static int population_size;
+static struct statistics total_statistics;
 
 static void schedule_initial_events(struct pqueue *queue)
 {
@@ -115,38 +115,45 @@ static void handle_event(int type, double t, struct pqueue *queue, struct statis
 }
 
 
-static void init_statistics(int population_size, struct statistics *statistics)
+static void init_statistics(struct statistics *statistics)
 {
 	int state;
 
-	statistics->population_size = population_size;
 	for (state = 0; state < STATE_COUNT; state++) {
-		if (state != HEALTHY) {
-			statistics->states[state].visit_count = 0;
-		} else {
-			statistics->states[state].visit_count = population_size;
-		}
+		statistics->states[state].visit_count = 0;
 		statistics->states[state].age_sum = 0.0;
 	}
 }
 
 
-void simulation_run(int population_size)
+void simulation_run(int popsize)
 {
 	struct pqueue *queue;
-	int person, event_type;
+	int person, event_type, state;
 	double time;
+	struct statistics partial_statistics;
 
-	queue = pqueue_new();
-	init_statistics(population_size, &statistics);
-	for (person = 0; person < population_size; person++) {
-		schedule_initial_events(queue);
-		while (pqueue_count(queue) > 0) {
-			pqueue_remove(queue, &event_type, &time);
-			handle_event(event_type, time, queue, &statistics);
+	population_size = popsize;
+	init_statistics(&total_statistics);
+#pragma omp parallel private (partial_statistics, queue, event_type, time, state)
+	{
+		init_statistics(&partial_statistics);
+		queue = pqueue_new();
+#pragma omp for
+		for (person = 0; person < population_size; person++) {
+			schedule_initial_events(queue);
+			while (pqueue_count(queue) > 0) {
+				pqueue_remove(queue, &event_type, &time);
+				handle_event(event_type, time, queue, &partial_statistics);
+			}
+		}
+		pqueue_delete(queue);
+#pragma omp critical
+		for (state = 0; state < STATE_COUNT; state++) {
+			total_statistics.states[state].visit_count += partial_statistics.states[state].visit_count;
+			total_statistics.states[state].age_sum += partial_statistics.states[state].age_sum;
 		}
 	}
-	pqueue_delete(queue);
 }
 
 
@@ -157,9 +164,9 @@ void simulation_print(void)
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	for (state = 0; state < STATE_COUNT; state++) {
-		frequency = ((double) statistics.states[state].visit_count) / ((double) statistics.population_size);
-		if (statistics.states[state].visit_count > 0) {
-			mean_age = statistics.states[state].age_sum / ((double) statistics.states[state].visit_count);
+		frequency = ((double) total_statistics.states[state].visit_count) / ((double) population_size);
+		if (total_statistics.states[state].visit_count > 0) {
+			mean_age = total_statistics.states[state].age_sum / ((double) total_statistics.states[state].visit_count);
 		} else {
 			mean_age = 0.0;
 		}
