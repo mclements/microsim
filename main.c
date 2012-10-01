@@ -4,21 +4,22 @@
 
 int main(int argc, char **argv)
 {
-	int n; /*population size*/
+	int population_size, exit_status;
+	char *endp;
 	
 	if (argc == 2) {
-		n = atoi(argv[1]); /*0 on failure*/
-		if (n > 0) {
-			simulation_init(n);
-			simulation_run();
+		population_size = strtol(argv[1], &endp, 10);
+		if ((*endp == '\0') && (population_size > 0)) {
+			simulation_run(population_size);
 			simulation_print();
+			exit_status = EXIT_SUCCESS;
 		} else {
 			fprintf(stderr, "Population size must be a positive integer\n");
-			exit(EXIT_FAILURE);
+			exit_status = EXIT_FAILURE;
 		}
 	} else {
-		fprintf(stderr, "Wrong number of arguments. Synopsis: gf population-size\n");
-		exit(EXIT_FAILURE);
+		fprintf(stderr, "Wrong number of arguments. Synopsis: %s population-size\n", argv[0]);
+		exit_status = EXIT_FAILURE;
 	}
-	return 0;
+	return exit_status;
 }

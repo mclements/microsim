@@ -23,34 +23,17 @@ The (discrete event) simulation consists of moving a population of N individuals
 #define GLEASON_HIGH 2 /*level > 7*/
 #define GLEASON_LEVEL_COUNT 3
 
-static char state_labels[STATE_COUNT][32] = {"Healthy", "Localised", "Locally advanced", "DX localised", "Dead"};
+const static char state_labels[STATE_COUNT][32] = {"Healthy", "Localised", "Locally advanced", "DX localised", "Dead"};
 
-static double progression_hazard_ratios[GLEASON_LEVEL_COUNT] = {1.0, 1.3874, 1.4027};
-static double dx_hazard_ratios[STATE_COUNT] = {-1.0, 1.1308, 0.5900, 1.2147};
+const static double progression_hazard_ratios[GLEASON_LEVEL_COUNT] = {1.0, 1.3874, 1.4027};
+const static double dx_hazard_ratios[STATE_COUNT] = {-1.0, 1.1308, 0.5900, 1.2147};
 
-static struct {
-	int visit_count;
-	double age_sum; /*for computation of mean age (with minimum rounding errors)*/
-} state_statistics[STATE_COUNT];
+struct statistics {
+	int population_size;
+	struct { int visit_count; double age_sum; } states[STATE_COUNT];
+};
 
-static int population_size;
-
-
-void simulation_init(int n)
-{
-	int state;
-
-	population_size = n;
-	for (state = 0; state < STATE_COUNT; state++) {
-		if (state != HEALTHY) {
-			state_statistics[state].visit_count = 0;
-		} else {
-			state_statistics[state].visit_count = population_size;
-		}
-		state_statistics[state].age_sum = 0.0;
-	}
-}
-
+static struct statistics statistics;
 
 static void schedule_initial_events(struct pqueue *queue)
 {
@@ -85,7 +68,7 @@ static int random_gleason_level(void)
 }
 
 
-static void handle_event(int type, double t, struct pqueue *queue) /*handle event at time t*/
+static void handle_event(int type, double t, struct pqueue *queue, struct statistics *statistics) /*handle event at time t*/
 {
 	double phr, dhr; /*hazard ratios for locally advanced and dx localised*/
 	double dtl, dtd; /*time increments for locally advanced and dx localised*/
@@ -125,25 +108,42 @@ static void handle_event(int type, double t, struct pqueue *queue) /*handle even
 		pqueue_clear(queue);
 		break;
 	}
-	state_statistics[type].visit_count++;
-	state_statistics[type].age_sum += t;
+	statistics->states[type].visit_count++;
+	statistics->states[type].age_sum += t;
 	
-	assert(state_statistics[type].age_sum >= 0.0); /*overflow check*/
+	assert(statistics->states[type].age_sum >= 0.0); /*overflow check*/
 }
 
 
-void simulation_run(void)
+static void init_statistics(int population_size, struct statistics *statistics)
+{
+	int state;
+
+	statistics->population_size = population_size;
+	for (state = 0; state < STATE_COUNT; state++) {
+		if (state != HEALTHY) {
+			statistics->states[state].visit_count = 0;
+		} else {
+			statistics->states[state].visit_count = population_size;
+		}
+		statistics->states[state].age_sum = 0.0;
+	}
+}
+
+
+void simulation_run(int population_size)
 {
 	struct pqueue *queue;
 	int person, event_type;
 	double time;
 
 	queue = pqueue_new();
+	init_statistics(population_size, &statistics);
 	for (person = 0; person < population_size; person++) {
 		schedule_initial_events(queue);
 		while (pqueue_count(queue) > 0) {
 			pqueue_remove(queue, &event_type, &time);
-			handle_event(event_type, time, queue);
+			handle_event(event_type, time, queue, &statistics);
 		}
 	}
 	pqueue_delete(queue);
@@ -157,9 +157,9 @@ void simulation_print(void)
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	for (state = 0; state < STATE_COUNT; state++) {
-		frequency = ((double) state_statistics[state].visit_count) / ((double) population_size);
-		if (state_statistics[state].visit_count > 0) {
-			mean_age = state_statistics[state].age_sum / ((double) state_statistics[state].visit_count);
+		frequency = ((double) statistics.states[state].visit_count) / ((double) statistics.population_size);
+		if (statistics.states[state].visit_count > 0) {
+			mean_age = statistics.states[state].age_sum / ((double) statistics.states[state].visit_count);
 		} else {
 			mean_age = 0.0;
 		}
