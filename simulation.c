@@ -52,7 +52,7 @@ void simulation_init(int n)
 }
 
 
-static void schedule_initial_events(void)
+static void schedule_initial_events(struct pqueue *queue)
 {
 	double t;
 	
@@ -61,12 +61,12 @@ static void schedule_initial_events(void)
 	if (runif(0,1) > 0.2241) {
 		/*account for cure (do nothing)*/
 	} else {
-		pqueue_insert(LOCALISED, t);
+		pqueue_insert(LOCALISED, t, queue);
 	}
 
 	/*death*/
 	t = rexp(80);
-	pqueue_insert(DEAD, t);
+	pqueue_insert(DEAD, t, queue);
 }
 
 
@@ -85,7 +85,7 @@ static int random_gleason_level(void)
 }
 
 
-static void handle_event(int type, double t) /*handle event at time t*/
+static void handle_event(int type, double t, struct pqueue *queue) /*handle event at time t*/
 {
 	double phr, dhr; /*hazard ratios for locally advanced and dx localised*/
 	double dtl, dtd; /*time increments for locally advanced and dx localised*/
@@ -109,9 +109,9 @@ static void handle_event(int type, double t) /*handle event at time t*/
 
 		/*schedule the event that will happen first*/		
 		if (dtl > dtd) {
-			pqueue_insert(LOCALLY_ADVANCED, t + dtl);
+			pqueue_insert(LOCALLY_ADVANCED, t + dtl, queue);
 		} else {
-			pqueue_insert(DX_LOCALISED, t + dtd);
+			pqueue_insert(DX_LOCALISED, t + dtd, queue);
 		}
 
 		break;
@@ -122,7 +122,7 @@ static void handle_event(int type, double t) /*handle event at time t*/
 		/*do nothing*/
 		break;
 	case DEAD:
-		pqueue_init(); /*clear the event queue*/
+		pqueue_clear(queue);
 		break;
 	}
 	state_statistics[type].visit_count++;
@@ -134,17 +134,19 @@ static void handle_event(int type, double t) /*handle event at time t*/
 
 void simulation_run(void)
 {
+	struct pqueue *queue;
 	int person, event_type;
 	double time;
 
-	pqueue_init();
+	queue = pqueue_new();
 	for (person = 0; person < population_size; person++) {
-		schedule_initial_events();
-		while (pqueue_count() > 0) {
-			pqueue_remove(&event_type, &time);
-			handle_event(event_type, time);
+		schedule_initial_events(queue);
+		while (pqueue_count(queue) > 0) {
+			pqueue_remove(queue, &event_type, &time);
+			handle_event(event_type, time, queue);
 		}
 	}
+	pqueue_delete(queue);
 }
 
 
