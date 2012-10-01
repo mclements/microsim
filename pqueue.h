@@ -1,4 +1,4 @@
-/*A minimum priority queue data structure*/
+/*A minimum-oriented priority queue data type*/
 
 #define PQUEUE_CAPACITY 10 /*maximum number of items that can be stored in a queue*/
 
