@@ -28,12 +28,10 @@ const static char state_labels[STATE_COUNT][32] = {"Healthy", "Localised", "Loca
 const static double progression_hazard_ratios[GLEASON_LEVEL_COUNT] = {1.0, 1.3874, 1.4027};
 const static double dx_hazard_ratios[STATE_COUNT] = {-1.0, 1.1308, 0.5900, 1.2147};
 
-struct statistics {
-	struct { int visit_count; double age_sum; } states[STATE_COUNT];
-};
+typedef struct { int visit_count; double age_sum; } state_statistics[STATE_COUNT];
 
 static int population_size;
-static struct statistics total_statistics;
+static state_statistics total_statistics;
 
 static void schedule_initial_events(struct pqueue *queue)
 {
@@ -68,7 +66,7 @@ static int random_gleason_level(void)
 }
 
 
-static void handle_event(int type, double t, struct pqueue *queue, struct statistics *statistics) /*handle event at time t*/
+static void handle_event(int type, double t, struct pqueue *queue, state_statistics statistics) /*handle event at time t*/
 {
 	double phr, dhr; /*hazard ratios for locally advanced and dx localised*/
 	double dtl, dtd; /*time increments for locally advanced and dx localised*/
@@ -108,20 +106,20 @@ static void handle_event(int type, double t, struct pqueue *queue, struct statis
 		pqueue_clear(queue);
 		break;
 	}
-	statistics->states[type].visit_count++;
-	statistics->states[type].age_sum += t;
+	statistics[type].visit_count++;
+	statistics[type].age_sum += t;
 	
-	assert(statistics->states[type].age_sum >= 0.0); /*overflow check*/
+	assert(statistics[type].age_sum >= 0.0); /*overflow check*/
 }
 
 
-static void init_statistics(struct statistics *statistics)
+static void init_statistics(state_statistics statistics)
 {
 	int state;
 
 	for (state = 0; state < STATE_COUNT; state++) {
-		statistics->states[state].visit_count = 0;
-		statistics->states[state].age_sum = 0.0;
+		statistics[state].visit_count = 0;
+		statistics[state].age_sum = 0.0;
 	}
 }
 
@@ -131,27 +129,27 @@ void simulation_run(int popsize)
 	struct pqueue *queue;
 	int person, event_type, state;
 	double time;
-	struct statistics partial_statistics;
+	state_statistics partial_statistics;
 
 	population_size = popsize;
-	init_statistics(&total_statistics);
+	init_statistics(total_statistics);
 #pragma omp parallel private (partial_statistics, queue, event_type, time, state)
 	{
-		init_statistics(&partial_statistics);
+		init_statistics(partial_statistics);
 		queue = pqueue_new();
 #pragma omp for
 		for (person = 0; person < population_size; person++) {
 			schedule_initial_events(queue);
 			while (pqueue_count(queue) > 0) {
 				pqueue_remove(queue, &event_type, &time);
-				handle_event(event_type, time, queue, &partial_statistics);
+				handle_event(event_type, time, queue, partial_statistics);
 			}
 		}
 		pqueue_delete(queue);
 #pragma omp critical
 		for (state = 0; state < STATE_COUNT; state++) {
-			total_statistics.states[state].visit_count += partial_statistics.states[state].visit_count;
-			total_statistics.states[state].age_sum += partial_statistics.states[state].age_sum;
+			total_statistics[state].visit_count += partial_statistics[state].visit_count;
+			total_statistics[state].age_sum += partial_statistics[state].age_sum;
 		}
 	}
 }
@@ -164,9 +162,9 @@ void simulation_print(void)
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	for (state = 0; state < STATE_COUNT; state++) {
-		frequency = ((double) total_statistics.states[state].visit_count) / ((double) population_size);
-		if (total_statistics.states[state].visit_count > 0) {
-			mean_age = total_statistics.states[state].age_sum / ((double) total_statistics.states[state].visit_count);
+		frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
+		if (total_statistics[state].visit_count > 0) {
+			mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
 		} else {
 			mean_age = 0.0;
 		}
