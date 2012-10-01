@@ -162,12 +162,14 @@ void simulation_print(void)
 	
 	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	for (state = 0; state < STATE_COUNT; state++) {
-		frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
-		if (total_statistics[state].visit_count > 0) {
-			mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
-		} else {
-			mean_age = 0.0;
+		if (state != HEALTHY) {
+			frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
+			if (total_statistics[state].visit_count > 0) {
+				mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
+			} else {
+				mean_age = 0.0;
+			}
+			printf("%-16s  %9.2f  %8.2f\n", state_labels[state], frequency, mean_age);
 		}
-		printf("%-16s  %9.2f  %8.2f\n", state_labels[state], frequency, mean_age);
 	}
 }
