@@ -1,9 +1,9 @@
 #CONFIGURATION
 
 progname = main
-CFLAGS = -Wall -DMATHLIB_STANDALONE -fopenmp
+CFLAGS = -Wall -fopenmp
 LDFLAGS = -fopenmp
-LDLIBS = -lm -lRmath
+LDLIBS = -lm
 
 #TEMPLATE
 

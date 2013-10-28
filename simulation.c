@@ -3,9 +3,10 @@ The (discrete event) simulation consists of moving a population of N individuals
 */
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <Rmath.h>
+#include "dist.h"
 #include "pqueue.h"
 #include "simulation.h"
 
@@ -38,15 +39,15 @@ static void schedule_initial_events(struct pqueue *queue)
 	double t;
 	
 	/*localised cancer*/
-	t = rweibull(exp(2.3525), 64.0218);
-	if (runif(0,1) > 0.2241) {
+	t = dist_weibull(exp(2.3525), 64.0218);
+	if (dist_unif() > 0.2241) {
 		/*account for cure (do nothing)*/
 	} else {
 		pqueue_insert(LOCALISED, t, queue);
 	}
 
 	/*death*/
-	t = rexp(80);
+	t = dist_exp(80);
 	pqueue_insert(DEAD, t, queue);
 }
 
@@ -55,9 +56,9 @@ static int random_gleason_level(void)
 {
 	int level;
 	
-	if (runif(0,1) < 0.6812) {
+	if (dist_unif() < 0.6812) {
 		level = GLEASON_LOW;
-	} else if (runif(0,1) < 0.5016) {
+	} else if (dist_unif() < 0.5016) {
 		level = GLEASON_MEDIUM;
 	} else {
 		level = GLEASON_HIGH;
@@ -81,12 +82,12 @@ static void handle_event(int type, double t, struct pqueue *queue, state_statist
 		
 		/*generate random time until Locally Advanced*/
 		phr = progression_hazard_ratios[gleason_level];
-		dtl = rweibull(shape, scale * pow(phr, -1.0 / shape));
+		dtl = dist_weibull(shape, scale * pow(phr, -1.0 / shape));
 
 		/*generate random time until DX Localised*/
 		dhr = dx_hazard_ratios[LOCALISED];
 		phr = progression_hazard_ratios[gleason_level] * dhr;
-		dtd = rweibull(shape, scale * pow(phr, -1.0 / shape));
+		dtd = dist_weibull(shape, scale * pow(phr, -1.0 / shape));
 
 		/*schedule the event that will happen first*/		
 		if (dtl > dtd) {
