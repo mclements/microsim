@@ -156,21 +156,33 @@ void simulation_run(int popsize)
 }
 
 
-void simulation_print(void)
+void simulation_print(int as_json)
 {
 	int state;
 	double frequency, mean_age;
 	
-	printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
-	for (state = 0; state < STATE_COUNT; state++) {
-		if (state != HEALTHY) {
-			frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
-			if (total_statistics[state].visit_count > 0) {
-				mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
-			} else {
-				mean_age = 0.0;
+	if (as_json) {
+		putchar('[');
+	} else {
+		printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
+	}
+	for (state = 1; state < STATE_COUNT; state++) {
+		frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
+		if (total_statistics[state].visit_count > 0) {
+			mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
+		} else {
+			mean_age = 0.0;
+		}
+		if (as_json) {
+			if (state > 1) {
+				putchar(',');
 			}
+			printf("{\"state\":\"%s\",\"freq\":%.2f,\"meanAge\":%.2f}", state_labels[state], frequency, mean_age);
+		} else {
 			printf("%-16s  %9.2f  %8.2f\n", state_labels[state], frequency, mean_age);
 		}
+	}
+	if (as_json) {
+		puts("]");
 	}
 }

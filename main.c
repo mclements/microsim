@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 		population_size = strtol(argv[1], &endp, 10);
 		if ((*endp == '\0') && (population_size > 0)) {
 			simulation_run(population_size);
-			simulation_print();
+			simulation_print(0);
 			exit_status = EXIT_SUCCESS;
 		} else {
 			fprintf(stderr, "Population size must be a positive integer\n");
