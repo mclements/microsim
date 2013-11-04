@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -e
+
+echoandrun() {
+	echo $@
+	$@
+}
+
+#change to project directory
+
+projectdir=$(dirname $(dirname $(readlink -f $0)))
+cd $projectdir
+
+#compile C to LLVM
+
+emmake make
+
+#build Javascript file without function main module
+
+##create a list of all objectfiles but main.o
+
+objfiles=
+for f in $(ls *.o); do
+	if [ $f != main.o ]; then
+		objfiles="$objfiles $f"
+	fi
+done
+
+##compile LLVM to Javascript
+
+echoandrun emcc $objfiles -o web/microsim.js -s EXPORTED_FUNCTIONS="['_simulation_run','_simulation_print']"
