@@ -1,7 +1,7 @@
 function log(str)
 {
 	var result = JSON.parse(str)
-	alert(result)
+	Tempo.prepare("result").render(result)
 }
 
 
