@@ -1,21 +1,39 @@
-function log(str)
+var resultRenderer
+var run
+var print
+
+function displayResult(json)
 {
-	var result = JSON.parse(str)
-	Tempo.prepare("result").render(result)
+	var result = JSON.parse(json)
+	resultRenderer.render(result)
 }
 
 
-function main()
+function submit(event)
 {
-	var run = Module.cwrap('simulation_run', 'number', ['number'])
-	var print = Module.cwrap('simulation_print', 'number', ['number'])
-	run(100)
+	var n = document.getElementById("population-size").value
+	run(n)
 
-	var savedLog = window.console.log
-	window.console.log = log
+	var defaultLogger = window.console.log
+	window.console.log = displayResult
 	var asJson = 1
 	print(asJson)
-	window.console.log = savedLog
+	window.console.log = defaultLogger
+	
+	event.preventDefault()
 }
 
-window.onload = main
+
+function init()
+{
+	//initialize global variables
+	resultRenderer = Tempo.prepare("result")
+	run = Module.cwrap('simulation_run', 'number', ['number'])
+	print = Module.cwrap('simulation_print', 'number', ['number'])
+
+	//register event handlers
+	var form = document.getElementById("input")
+	form.addEventListener("submit", submit, false)
+}
+
+window.onload = init
