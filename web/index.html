@@ -10,7 +10,7 @@
 	</head>
 	<body>
 		<noscript>
-			<strong class="error">This client-side application requires a Javascript enabled browser</strong>
+			<p><strong class="error">This client-side application requires a Javascript enabled browser</strong></p>
 		</noscript>
 
 		<h1>Microsimulation</h1>
@@ -27,7 +27,7 @@
 				<th align="left">Frequency</th>
 				<th align="left" class="last">Mean age</th>
 			</tr>
-			<tr data-template>
+			<tr data-template="data-template">
 				<td align="left" class="first">{{state}}</td>
 				<td align="right">{{freq | format 2}}</td>
 				<td align="right" class="last">{{meanAge | format 2}}</td>
@@ -35,7 +35,7 @@
 		</table>
 
 		<div id="execution-time" class="discrete">
-			<p data-template>Execution time: {{[0] | format 1}} seconds</p>
+			<p data-template="data-template">Execution time: {{[0] | format 1}} seconds</p>
 		</div>
 	</body>
 </html>
