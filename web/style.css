@@ -24,6 +24,10 @@ td.last, th.last {
 	padding-right: 0
 }
 
+.discrete {
+	font-size: small
+}
+
 .error {
 	color: red;
 	background-color: white
