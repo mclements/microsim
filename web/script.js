@@ -14,27 +14,36 @@ window.onload = function () {
 		var result = JSON.parse(json)
 		resultRenderer.render(result)
 		execTimeRenderer.render([[executionTime]])
+		document.getElementById("preloader").style.display = "none"
 		document.getElementById("output").style.display = "block"
+	}
+
+
+	function doSubmit(n)
+	{
+		var asJson = 1
+
+		var start = new Date()
+		run(n)
+		executionTime = (new Date() - start) / 1000;
+
+		window.console.log = displayResult
+		print(asJson)
+		window.console.log = defaultLogger	
 	}
 
 
 	function submit(event)
 	{
-		var asJson = 1
-		
-		//clear previous output		
+		//clear previous output
 		document.getElementById("output").style.display = "none"
 		errorRenderer.clear()
 		
 		var n = document.getElementById("population-size").value
 		if (n.match(/^[0-9]+$/)) {
-			var start = new Date()	
-			run(n)
-			executionTime = (new Date() - start) / 1000;
-
-			window.console.log = displayResult
-			print(asJson)
-			window.console.log = defaultLogger
+			document.getElementById("preloader").style.display = "inline"
+			//set timeout to force page update
+			setTimeout(function() { doSubmit(n) }, 100)
 		} else {
 			errorRenderer.render([[n]])
 		}	
@@ -45,6 +54,7 @@ window.onload = function () {
 	var form = document.getElementById("input")
 	form.addEventListener("submit", submit, false)
 	
-	//hide output template
+	//hide preloader and output
+	document.getElementById("preloader").style.display = "none"
 	document.getElementById("output").style.display = "none"
 }
