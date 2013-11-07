@@ -7,13 +7,13 @@ window.onload = function () {
 	var errorRenderer = Tempo.prepare("error")
 
 	var defaultLogger = window.console.log
-	var executionTime //in seconds
+	var executionTime //in milliseconds
 
 	function displayResult(json)
 	{
 		var result = JSON.parse(json)
 		resultRenderer.render(result)
-		execTimeRenderer.render([[executionTime]])
+		execTimeRenderer.render([[executionTime / 1000]])
 		document.getElementById("preloader").style.display = "none"
 		document.getElementById("output").style.display = "block"
 	}
@@ -25,7 +25,7 @@ window.onload = function () {
 
 		var start = new Date()
 		run(n)
-		executionTime = (new Date() - start) / 1000;
+		executionTime = new Date() - start;
 
 		window.console.log = displayResult
 		print(asJson)
