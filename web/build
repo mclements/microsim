@@ -29,4 +29,4 @@ done
 
 ##compile LLVM to Javascript
 
-echoandrun emcc $objfiles -o web/lib/microsim.js -s EXPORTED_FUNCTIONS="['_simulation_run','_simulation_print']"
+echoandrun emcc $objfiles -o web/lib/microsim.js -s EXPORTED_FUNCTIONS="['_simulation_run','_simulation_print_summary','_simulation_print_visits']"
