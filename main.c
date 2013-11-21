@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 			simulation_run(population_size);
 			simulation_print_summary(0);
 			putchar('\n');
-			simulation_print_visits();
+			simulation_print_visits(0);
 			exit_status = EXIT_SUCCESS;
 		} else {
 			fprintf(stderr, "Population size must be a positive integer\n");

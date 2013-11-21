@@ -217,24 +217,42 @@ void simulation_print_summary(int as_json)
 }
 
 
-void simulation_print_visits(void)
+void simulation_print_visits(int as_json)
 {
 	int label_widths[STATE_COUNT];
 	int age, state;
 	
-	printf("Age");
-	for (state = 0; state < STATE_COUNT; state++) {
-		label_widths[state] = strlen(state_labels[state]);
-		if (state > 0) {
-			printf("  %s", state_labels[state]);
+	if (as_json) {
+		putchar('[');
+		for (age = 0; age <= AGE_MAX; age++) {
+			if (age > 0) {
+				putchar(',');
+			}
+			putchar('{');
+			for (state = 1; state < STATE_COUNT; state++) {
+				if (state > 1) {
+					putchar(',');
+				}
+				printf("\"%s\":%d", state_labels[state], total_statistics[state].visits[age]);
+			}
+			putchar('}');
 		}
-	}
-	putchar('\n');
-	for (age = 0; age <= AGE_MAX; age++) {
-		printf("%3d", age);
-		for (state = 1; state < STATE_COUNT; state++) {
-			printf("  %*d", label_widths[state], total_statistics[state].visits[age]);
+		putchar(']');
+	} else {
+		printf("Age");
+		for (state = 0; state < STATE_COUNT; state++) {
+			label_widths[state] = strlen(state_labels[state]);
+			if (state > 0) {
+				printf("  %s", state_labels[state]);
+			}
 		}
 		putchar('\n');
+		for (age = 0; age <= AGE_MAX; age++) {
+			printf("%3d", age);
+			for (state = 1; state < STATE_COUNT; state++) {
+				printf("  %*d", label_widths[state], total_statistics[state].visits[age]);
+			}
+			putchar('\n');
+		}
 	}
 }
