@@ -6,9 +6,12 @@ The (discrete event) simulation consists of moving a population of N individuals
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "dist.h"
 #include "pqueue.h"
 #include "simulation.h"
+
+#define AGE_MAX 200
 
 /*states/event types*/
 #define HEALTHY 0
@@ -29,7 +32,10 @@ const static char state_labels[STATE_COUNT][32] = {"Healthy", "Localised", "Loca
 const static double progression_hazard_ratios[GLEASON_LEVEL_COUNT] = {1.0, 1.3874, 1.4027};
 const static double dx_hazard_ratios[STATE_COUNT] = {-1.0, 1.1308, 0.5900, 1.2147};
 
-typedef struct { int visit_count; double age_sum; } state_statistics[STATE_COUNT];
+typedef struct { 
+	double age_sum;
+	int visits[AGE_MAX + 1];
+} state_statistics[STATE_COUNT];
 
 static int population_size;
 static state_statistics total_statistics;
@@ -107,8 +113,12 @@ static void handle_event(int type, double t, struct pqueue *queue, state_statist
 		pqueue_clear(queue);
 		break;
 	}
-	statistics[type].visit_count++;
 	statistics[type].age_sum += t;
+	if ((int) t <= AGE_MAX) {
+		statistics[type].visits[(int) t]++;
+	} else {
+		statistics[type].visits[AGE_MAX]++;
+	}
 	
 	assert(statistics[type].age_sum >= 0.0); /*overflow check*/
 }
@@ -116,25 +126,39 @@ static void handle_event(int type, double t, struct pqueue *queue, state_statist
 
 static void init_statistics(state_statistics statistics)
 {
-	int state;
+	int state, age;
 
 	for (state = 0; state < STATE_COUNT; state++) {
-		statistics[state].visit_count = 0;
 		statistics[state].age_sum = 0.0;
+		for (age = 0; age <= AGE_MAX; age++) {
+			statistics[state].visits[age] = 0;
+		}
 	}
+}
+
+
+static int sum(const int a[], int n)
+{
+	int s, i;
+	
+	s = 0;
+	for (i = 0; i < n; i++) {
+		s += a[i];
+	}
+	return s;
 }
 
 
 void simulation_run(int popsize)
 {
 	struct pqueue *queue;
-	int person, event_type, state;
+	int person, event_type, state, age;
 	double time;
 	state_statistics partial_statistics;
 
 	population_size = popsize;
 	init_statistics(total_statistics);
-#pragma omp parallel private (partial_statistics, queue, event_type, time, state)
+#pragma omp parallel private (partial_statistics, queue, event_type, time, state, age)
 	{
 		init_statistics(partial_statistics);
 		queue = pqueue_new();
@@ -149,16 +173,20 @@ void simulation_run(int popsize)
 		pqueue_delete(queue);
 #pragma omp critical
 		for (state = 0; state < STATE_COUNT; state++) {
-			total_statistics[state].visit_count += partial_statistics[state].visit_count;
 			total_statistics[state].age_sum += partial_statistics[state].age_sum;
+			for (age = 0; age <= AGE_MAX; age++) {
+				total_statistics[state].visits[age] = partial_statistics[state].visits[age];
+			}
 		}
 	}
+
+	assert(sum(total_statistics[DEAD].visits, AGE_MAX + 1) == popsize);
 }
 
 
-void simulation_print(int as_json)
+void simulation_print_summary(int as_json)
 {
-	int state;
+	int state, visits;
 	double frequency, mean_age;
 	
 	if (as_json) {
@@ -167,9 +195,10 @@ void simulation_print(int as_json)
 		printf("%-16s  %-9s  %-8s\n", "STATE", "FREQUENCY", "MEAN AGE");
 	}
 	for (state = 1; state < STATE_COUNT; state++) {
-		frequency = ((double) total_statistics[state].visit_count) / ((double) population_size);
-		if (total_statistics[state].visit_count > 0) {
-			mean_age = total_statistics[state].age_sum / ((double) total_statistics[state].visit_count);
+		visits = sum(total_statistics[state].visits, AGE_MAX + 1);
+		frequency = ((double) visits) / ((double) population_size);
+		if (visits > 0) {
+			mean_age = total_statistics[state].age_sum / ((double) visits);
 		} else {
 			mean_age = 0.0;
 		}
@@ -184,5 +213,28 @@ void simulation_print(int as_json)
 	}
 	if (as_json) {
 		puts("]");
+	}
+}
+
+
+void simulation_print_visits(void)
+{
+	int label_widths[STATE_COUNT];
+	int age, state;
+	
+	printf("Age");
+	for (state = 0; state < STATE_COUNT; state++) {
+		label_widths[state] = strlen(state_labels[state]);
+		if (state > 0) {
+			printf("  %s", state_labels[state]);
+		}
+	}
+	putchar('\n');
+	for (age = 0; age <= AGE_MAX; age++) {
+		printf("%3d", age);
+		for (state = 1; state < STATE_COUNT; state++) {
+			printf("  %*d", label_widths[state], total_statistics[state].visits[age]);
+		}
+		putchar('\n');
 	}
 }
