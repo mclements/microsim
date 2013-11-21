@@ -1,8 +1,8 @@
 #CONFIGURATION
 
 progname = main
-CFLAGS = -Wall -fopenmp
-LDFLAGS = -fopenmp
+CFLAGS = -Wall #-fopenmp
+LDFLAGS = #-fopenmp
 LDLIBS = -lm
 
 #TEMPLATE
