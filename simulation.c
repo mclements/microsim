@@ -223,21 +223,21 @@ void simulation_print_visits(int as_json)
 	int age, state;
 	
 	if (as_json) {
-		putchar('[');
-		for (age = 0; age <= AGE_MAX; age++) {
-			if (age > 0) {
+		putchar('{');
+		for (state = 1; state < STATE_COUNT; state++) {
+			if (state > 1) {
 				putchar(',');
 			}
-			putchar('{');
-			for (state = 1; state < STATE_COUNT; state++) {
-				if (state > 1) {
+			printf("\"%s\":[", state_labels[state]);
+			for (age = 0; age <= AGE_MAX; age++) {
+				if (age > 0) {
 					putchar(',');
 				}
-				printf("\"%s\":%d", state_labels[state], total_statistics[state].visits[age]);
+				printf("%d", total_statistics[state].visits[age]);
 			}
-			putchar('}');
+			putchar(']');
 		}
-		putchar(']');
+		putchar('}');
 	} else {
 		printf("Age");
 		for (state = 0; state < STATE_COUNT; state++) {
