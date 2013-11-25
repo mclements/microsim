@@ -24,12 +24,24 @@ window.onload = function () {
 	}
 
 
-	function displayVisits(json)
+	function displayVisits(json, n)
 	{
-		var result = JSON.parse(json)
+		var ageMax = 150
 		var ofs = 20
-		var xs = result["Dead"].map(function (x, i) { return i })
-		var ys = [result["Localised"], result["Locally advanced"], result["DX localised"], result["Dead"]]
+		var result = JSON.parse(json)
+
+		var xs = []
+		for (var i = 0; i <= ageMax; i++) {
+			xs.push(i)
+		}
+		
+		var ys = []
+		for (var state in result) {
+			var freqs = result[state].map(function (x) { return x / n })
+			var slicedFreqs = freqs.slice(0, ageMax + 1)
+			ys.push(slicedFreqs)
+		}
+
 		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
 		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, ys, opts)
@@ -47,7 +59,7 @@ window.onload = function () {
 		window.console.log = displaySummary
 		printSummary(asJson)
 		
-		window.console.log = displayVisits
+		window.console.log = function (str) { displayVisits(str, n) }
 		printVisits(asJson)
 		
 		window.console.log = defaultLogger
