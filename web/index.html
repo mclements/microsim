@@ -5,6 +5,9 @@
 		<title>Microsimulation</title>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		<script type="text/javascript" src="lib/tempo.min.js"></script>
+		<script type="text/javascript" src="lib/raphael-min.js"></script>
+		<script type="text/javascript" src="lib/g.raphael-min.js"></script>
+		<script type="text/javascript" src="lib/g.line-min.js"></script>
 		<script type="text/javascript" src="lib/microsim.js"></script>
 		<script type="text/javascript" src="script.js"></script>
 	</head>
@@ -35,9 +38,11 @@
 				</tr>
 			</table>
 
+			<div id="chart" style="margin: 1em 0"></div>
+
 			<div id="execution-time" class="discrete">
 				<p data-template="data-template">Execution time: {{[0] | format 1}} seconds</p>
-			</div>
+			</div>			
 		</div>
 
 		<div id="error" class="error">

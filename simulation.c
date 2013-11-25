@@ -238,6 +238,7 @@ void simulation_print_visits(int as_json)
 			putchar(']');
 		}
 		putchar('}');
+		putchar('\n');
 	} else {
 		printf("Age");
 		for (state = 0; state < STATE_COUNT; state++) {

@@ -6187,80 +6187,81 @@ function _simulation_print_visits($as_json){
  label=3;break;
  case 14: 
  var $call19=_putchar(125);
+ var $call20=_putchar(10);
  label=30;break;
  case 15: 
- var $call20=_printf(736,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 1)|0,STACKTOP = (((STACKTOP)+7)&-8),(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=0,tempVarArgs)); STACKTOP=tempVarArgs;
+ var $call21=_printf(736,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 1)|0,STACKTOP = (((STACKTOP)+7)&-8),(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=0,tempVarArgs)); STACKTOP=tempVarArgs;
  $state=0;
  label=16;break;
  case 16: 
  var $11=$state;
- var $cmp22=($11|0)<5;
- if($cmp22){label=17;break;}else{label=21;break;}
+ var $cmp23=($11|0)<5;
+ if($cmp23){label=17;break;}else{label=21;break;}
  case 17: 
  var $12=$state;
- var $arrayidx24=((8+($12<<5))|0);
- var $arraydecay25=(($arrayidx24)|0);
- var $call26=_strlen($arraydecay25);
+ var $arrayidx25=((8+($12<<5))|0);
+ var $arraydecay26=(($arrayidx25)|0);
+ var $call27=_strlen($arraydecay26);
  var $13=$state;
- var $arrayidx27=(($label_widths+($13<<2))|0);
- HEAP32[(($arrayidx27)>>2)]=$call26;
+ var $arrayidx28=(($label_widths+($13<<2))|0);
+ HEAP32[(($arrayidx28)>>2)]=$call27;
  var $14=$state;
- var $cmp28=($14|0)>0;
- if($cmp28){label=18;break;}else{label=19;break;}
+ var $cmp29=($14|0)>0;
+ if($cmp29){label=18;break;}else{label=19;break;}
  case 18: 
  var $15=$state;
- var $arrayidx30=((8+($15<<5))|0);
- var $arraydecay31=(($arrayidx30)|0);
- var $call32=_printf(712,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 8)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$arraydecay31,tempVarArgs)); STACKTOP=tempVarArgs;
+ var $arrayidx31=((8+($15<<5))|0);
+ var $arraydecay32=(($arrayidx31)|0);
+ var $call33=_printf(712,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 8)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$arraydecay32,tempVarArgs)); STACKTOP=tempVarArgs;
  label=19;break;
  case 19: 
  label=20;break;
  case 20: 
  var $16=$state;
- var $inc35=((($16)+(1))|0);
- $state=$inc35;
+ var $inc36=((($16)+(1))|0);
+ $state=$inc36;
  label=16;break;
  case 21: 
- var $call37=_putchar(10);
+ var $call38=_putchar(10);
  $age=0;
  label=22;break;
  case 22: 
  var $17=$age;
- var $cmp39=($17|0)<=200;
- if($cmp39){label=23;break;}else{label=29;break;}
+ var $cmp40=($17|0)<=200;
+ if($cmp40){label=23;break;}else{label=29;break;}
  case 23: 
  var $18=$age;
- var $call41=_printf(704,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 8)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$18,tempVarArgs)); STACKTOP=tempVarArgs;
+ var $call42=_printf(704,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 8)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$18,tempVarArgs)); STACKTOP=tempVarArgs;
  $state=1;
  label=24;break;
  case 24: 
  var $19=$state;
- var $cmp43=($19|0)<5;
- if($cmp43){label=25;break;}else{label=27;break;}
+ var $cmp44=($19|0)<5;
+ if($cmp44){label=25;break;}else{label=27;break;}
  case 25: 
  var $20=$state;
- var $arrayidx45=(($label_widths+($20<<2))|0);
- var $21=HEAP32[(($arrayidx45)>>2)];
+ var $arrayidx46=(($label_widths+($20<<2))|0);
+ var $21=HEAP32[(($arrayidx46)>>2)];
  var $22=$age;
  var $23=$state;
- var $arrayidx46=((1008+((($23)*(816))&-1))|0);
- var $visits47=(($arrayidx46+8)|0);
- var $arrayidx48=(($visits47+($22<<2))|0);
- var $24=HEAP32[(($arrayidx48)>>2)];
- var $call49=_printf(696,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 16)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$21,HEAP32[(((tempVarArgs)+(8))>>2)]=$24,tempVarArgs)); STACKTOP=tempVarArgs;
+ var $arrayidx47=((1008+((($23)*(816))&-1))|0);
+ var $visits48=(($arrayidx47+8)|0);
+ var $arrayidx49=(($visits48+($22<<2))|0);
+ var $24=HEAP32[(($arrayidx49)>>2)];
+ var $call50=_printf(696,(tempVarArgs=STACKTOP,STACKTOP = (STACKTOP + 16)|0,(assert((STACKTOP|0) < (STACK_MAX|0))|0),HEAP32[((tempVarArgs)>>2)]=$21,HEAP32[(((tempVarArgs)+(8))>>2)]=$24,tempVarArgs)); STACKTOP=tempVarArgs;
  label=26;break;
  case 26: 
  var $25=$state;
- var $inc51=((($25)+(1))|0);
- $state=$inc51;
+ var $inc52=((($25)+(1))|0);
+ $state=$inc52;
  label=24;break;
  case 27: 
- var $call53=_putchar(10);
+ var $call54=_putchar(10);
  label=28;break;
  case 28: 
  var $26=$age;
- var $inc55=((($26)+(1))|0);
- $age=$inc55;
+ var $inc56=((($26)+(1))|0);
+ $age=$inc56;
  label=22;break;
  case 29: 
  label=30;break;

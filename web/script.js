@@ -10,6 +10,10 @@ window.onload = function () {
 	var defaultLogger = window.console.log
 	var executionTime //in milliseconds
 
+	var chartWidth = 600
+	var chartHeight = 300
+	var paper = Raphael(document.getElementById("chart"), chartWidth, chartHeight)
+
 	function displaySummary(json)
 	{
 		var result = JSON.parse(json)
@@ -23,7 +27,13 @@ window.onload = function () {
 	function displayVisits(json)
 	{
 		var result = JSON.parse(json)
-		/*to be implemented*/
+		var ofs = 20
+		var xs = result["Dead"].map(function (x, i) { return i })
+		var ys = [result["Localised"], result["Locally advanced"], result["DX localised"], result["Dead"]]
+		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
+		paper.clear()
+		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, ys, opts)
+		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, result["Localised"])
 	}
 
 
