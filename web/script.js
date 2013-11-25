@@ -33,7 +33,6 @@ window.onload = function () {
 		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
 		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, ys, opts)
-		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, result["Localised"])
 	}
 
 
