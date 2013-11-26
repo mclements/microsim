@@ -7,14 +7,11 @@ window.onload = function () {
 	var execTimeRenderer = Tempo.prepare("execution-time")
 	var errorRenderer = Tempo.prepare("error")
 
-	var defaultLogger = window.console.log
-	var executionTime //in milliseconds
+	var paperWidth = document.getElementsByTagName("body")[0].offsetWidth
+	var paperHeight = Math.floor(paperWidth * 0.5)
+	var paper = Raphael(document.getElementById("chart"), paperWidth, paperHeight)
 
-	var chartWidth = 600
-	var chartHeight = 300
-	var paper = Raphael(document.getElementById("chart"), chartWidth, chartHeight)
-
-	function displaySummary(json)
+	function displaySummary(json, executionTime)
 	{
 		var result = JSON.parse(json)
 		resultRenderer.render(result)
@@ -27,7 +24,7 @@ window.onload = function () {
 	function displayVisits(json, n)
 	{
 		var ageMax = 150
-		var ofs = 20
+		var ofs = 30
 		var result = JSON.parse(json)
 
 		var xs = []
@@ -44,7 +41,7 @@ window.onload = function () {
 
 		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
-		paper.linechart(ofs, ofs, chartWidth - ofs*2, chartHeight - ofs*2, xs, ys, opts)
+		paper.linechart(ofs, ofs, paper.width - ofs*2, paper.height - ofs*2, xs, ys, opts)
 	}
 
 
@@ -56,7 +53,9 @@ window.onload = function () {
 		run(n)
 		executionTime = new Date() - start
 
-		window.console.log = displaySummary
+		var defaultLogger = window.console.log
+
+		window.console.log = function (str) { displaySummary(str, executionTime) }
 		printSummary(asJson)
 		
 		window.console.log = function (str) { displayVisits(str, n) }
