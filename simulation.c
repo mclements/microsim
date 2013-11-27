@@ -53,7 +53,7 @@ static void schedule_initial_events(struct pqueue *queue)
 	}
 
 	/*death*/
-	t = dist_exp(80);
+	t = dist_weibull(6.0,86.23298);
 	pqueue_insert(DEAD, t, queue);
 }
 
