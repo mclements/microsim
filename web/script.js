@@ -10,7 +10,7 @@ window.onload = function () {
 	var execTimeRenderer = Tempo.prepare("execution-time")
 	var errorRenderer = Tempo.prepare("error")
 
-	var paperWidth = document.getElementsByTagName("body")[0].offsetWidth
+	var paperWidth = document.getElementById("chart").offsetWidth
 	var paperHeight = Math.floor(paperWidth * 0.5)
 	var paper = Raphael(document.getElementById("chart"), paperWidth, paperHeight)
 
@@ -39,7 +39,7 @@ window.onload = function () {
 	function displayChart(json, n)
 	{
 		var ageMax = 150
-		var ofs = 30
+
 		var result = JSON.parse(json)
 
 		var xs = []
@@ -58,9 +58,13 @@ window.onload = function () {
 
 		chartTitleRenderer.render([["Estimated probability per age"]])
 		
-		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
-		paper.linechart(ofs, ofs, paper.width - ofs*2, paper.height - ofs*2, xs, ys, opts)
+		var left = 30
+		var top = 0
+		var w = paper.width - left - 1
+		var h = paper.height - 10
+		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
+		paper.linechart(left, top, w, h, xs, ys, opts)
 
 		legendsRenderer.render(legends(states))
 	}
