@@ -4,7 +4,7 @@ window.onload = function () {
 	var printVisits = Module.cwrap('simulation_print_visits', 'number', ['number'])
 
 	var preloaderRenderer = Tempo.prepare("preloader")
-	var resultRenderer = Tempo.prepare("result-table")
+	var summaryRenderer = Tempo.prepare("summary")
 	var chartTitleRenderer = Tempo.prepare("chart-title")
 	var legendsRenderer = Tempo.prepare("chart-legends")
 	var execTimeRenderer = Tempo.prepare("execution-time")
@@ -29,14 +29,14 @@ window.onload = function () {
 	function displaySummary(json, executionTime)
 	{
 		var result = JSON.parse(json)
-		resultRenderer.render(result)
+		summaryRenderer.render(result)
 		execTimeRenderer.render([[executionTime / 1000]])
 		preloaderRenderer.clear()
 		document.getElementById("output").style.display = "block"
 	}
 
 
-	function displayVisits(json, n)
+	function displayChart(json, n)
 	{
 		var ageMax = 150
 		var ofs = 30
@@ -79,7 +79,7 @@ window.onload = function () {
 		window.console.log = function (str) { displaySummary(str, executionTime) }
 		printSummary(asJson)
 		
-		window.console.log = function (str) { displayVisits(str, n) }
+		window.console.log = function (str) { displayChart(str, n) }
 		printVisits(asJson)
 		
 		window.console.log = defaultLogger
