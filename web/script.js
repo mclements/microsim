@@ -106,11 +106,19 @@ window.onload = function () {
 		}	
 		event.preventDefault()
 	}
-
-	//register event handlers
-	var form = document.getElementById("input")
-	form.addEventListener("submit", submit, false)
 	
-	//hide output
-	document.getElementById("output").style.display = "none"
+	
+	function init()
+	{
+		//register event handlers
+		var form = document.getElementById("input")
+		form.addEventListener("submit", submit, false)
+	
+		//hide output
+		document.getElementById("output").style.display = "none"
+		
+		document.getElementById("population-size").select()
+	}
+	
+	init()
 }
