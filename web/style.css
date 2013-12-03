@@ -24,6 +24,16 @@ td.last, th.last {
 	padding-right: 0
 }
 
+ul.horizontal {
+	list-style-type: none;
+	padding-left: 0
+}
+
+ul.horizontal li {
+	display: inline;
+	margin-left: 1.5em
+}
+
 .discrete {
 	font-size: small
 }

@@ -4,12 +4,25 @@ window.onload = function () {
 	var printVisits = Module.cwrap('simulation_print_visits', 'number', ['number'])
 
 	var resultRenderer = Tempo.prepare("result-table")
+	var legendsRenderer = Tempo.prepare("chart-legends")
 	var execTimeRenderer = Tempo.prepare("execution-time")
 	var errorRenderer = Tempo.prepare("error")
 
 	var paperWidth = document.getElementsByTagName("body")[0].offsetWidth
 	var paperHeight = Math.floor(paperWidth * 0.5)
 	var paper = Raphael(document.getElementById("chart"), paperWidth, paperHeight)
+
+	function legends(states)
+	{
+		var result = []
+		for (var i in states) {
+			var hsb = Raphael.g.colors[i].match(/(\d*\.\d+)/g) //"hsb(h, s, b)" -> [h, s, b]
+			var rgb = Raphael.hsb2rgb(hsb[0], hsb[1], hsb[2])
+			result.push({state: states[i], color: rgb.hex})
+		}
+		return result
+	}
+
 
 	function displaySummary(json, executionTime)
 	{
@@ -33,15 +46,19 @@ window.onload = function () {
 		}
 		
 		var ys = []
+		var states = []
 		for (var state in result) {
 			var freqs = result[state].map(function (x) { return x / n })
 			var slicedFreqs = freqs.slice(0, ageMax + 1)
 			ys.push(slicedFreqs)
+			states.push(state)
 		}
 
 		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
 		paper.linechart(ofs, ofs, paper.width - ofs*2, paper.height - ofs*2, xs, ys, opts)
+
+		legendsRenderer.render(legends(states))
 	}
 
 

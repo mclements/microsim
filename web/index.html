@@ -37,9 +37,17 @@
 					<td align="right" class="last">{{meanAge | format 2}}</td>
 				</tr>
 			</table>
-
-			<div id="chart" style="margin: 1em 0"></div>
-
+			
+			<div style="text-align: center">
+				<p class="discrete">Estimated probability per age</p>
+			
+				<div id="chart"></div>
+			
+				<ul id="chart-legends" class="discrete horizontal">
+					<li data-template="data-template"><font color="{{color}}">■</font> {{state}}</li>
+				</ul>			
+			</div>
+			
 			<div id="execution-time" class="discrete">
 				<p data-template="data-template">Execution time: {{[0] | format 1}} seconds</p>
 			</div>			
