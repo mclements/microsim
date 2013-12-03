@@ -3,7 +3,9 @@ window.onload = function () {
 	var printSummary = Module.cwrap('simulation_print_summary', 'number', ['number'])
 	var printVisits = Module.cwrap('simulation_print_visits', 'number', ['number'])
 
+	var preloaderRenderer = Tempo.prepare("preloader")
 	var resultRenderer = Tempo.prepare("result-table")
+	var chartTitleRenderer = Tempo.prepare("chart-title")
 	var legendsRenderer = Tempo.prepare("chart-legends")
 	var execTimeRenderer = Tempo.prepare("execution-time")
 	var errorRenderer = Tempo.prepare("error")
@@ -29,7 +31,7 @@ window.onload = function () {
 		var result = JSON.parse(json)
 		resultRenderer.render(result)
 		execTimeRenderer.render([[executionTime / 1000]])
-		document.getElementById("preloader").style.display = "none"
+		preloaderRenderer.clear()
 		document.getElementById("output").style.display = "block"
 	}
 
@@ -54,6 +56,8 @@ window.onload = function () {
 			states.push(state)
 		}
 
+		chartTitleRenderer.render([["Estimated probability per age"]])
+		
 		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
 		paper.clear()
 		paper.linechart(ofs, ofs, paper.width - ofs*2, paper.height - ofs*2, xs, ys, opts)
@@ -90,7 +94,7 @@ window.onload = function () {
 		
 		var n = document.getElementById("population-size").value
 		if (n.match(/^[0-9]+$/)) {
-			document.getElementById("preloader").style.display = "inline"
+			preloaderRenderer.render([["Executing..."]])
 			//set timeout to force page update
 			setTimeout(function() { doSubmit(n) }, 100)
 		} else {
@@ -103,7 +107,6 @@ window.onload = function () {
 	var form = document.getElementById("input")
 	form.addEventListener("submit", submit, false)
 	
-	//hide preloader and output
-	document.getElementById("preloader").style.display = "none"
+	//hide output
 	document.getElementById("output").style.display = "none"
 }

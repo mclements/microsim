@@ -21,7 +21,7 @@
 		<p>Move a population of <var>N</var> individuals through a set of <var>M</var> states from healthy to dead, and for each state, record the number of visits per age.</p>
 
 		<form id="input" action="">
-			<p><label for="population-size">Population size:</label> <input id="population-size" name="population-size" value="1000" /> <input type="submit" value="Run"/> <span id="preloader" class="discrete" style="margin-left: 1em; font-style: italic">Executing...</span></p>
+			<p><label for="population-size">Population size:</label> <input id="population-size" name="population-size" value="1000" /> <input type="submit" value="Run"/> <span id="preloader" class="discrete" style="margin-left: 1em; font-style: italic"><span data-template="data-template">{{[0]}}</span></span></p>
 		</form>
 		
 		<div id="output">
@@ -39,7 +39,7 @@
 			</table>
 			
 			<div style="text-align: center">
-				<p class="discrete">Estimated probability per age</p>
+				<p id="chart-title" class="discrete"><span data-template="data-template">{{[0]}}<span></p>
 			
 				<div id="chart"></div>
 			
