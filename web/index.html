@@ -5,11 +5,17 @@
 		<title>Microsimulation</title>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		<script type="text/javascript" src="lib/tempo.min.js"></script>
-		<script type="text/javascript" src="lib/raphael-min.js"></script>
-		<script type="text/javascript" src="lib/g.raphael-min.js"></script>
-		<script type="text/javascript" src="lib/g.line-min.js"></script>
+		<script type="text/javascript" src="lib/d3.v2.min.js"></script>
+		<script type="text/javascript" src="lib/nv.d3.min.js"></script>
 		<script type="text/javascript" src="lib/microsim.js"></script>
 		<script type="text/javascript" src="script.js"></script>
+		<link href="lib/nv.d3.css" rel="stylesheet" type="text/css"/>
+		<style>
+		  #chart svg {
+		  height: 400px;
+		  width: 800px;
+		  }
+		</style>
 	</head>
 	<body>
 		<noscript>
@@ -41,11 +47,8 @@
 			<div style="text-align: center; margin: 2em 0">
 				<p id="chart-title" class="discrete"><em data-template="data-template">{{[0]}}</em></p>
 			
-				<div id="chart"></div>
-			
-				<ul id="chart-legends" class="discrete horizontal">
-					<li data-template="data-template"><font color="{{color}}">■</font> {{state}}</li>
-				</ul>			
+			<div id="chart"> 
+			  <svg></svg> 
 			</div>
 			
 			<div id="execution-time" class="discrete">

@@ -6,24 +6,24 @@ window.onload = function () {
 	var preloaderRenderer = Tempo.prepare("preloader")
 	var summaryRenderer = Tempo.prepare("summary")
 	var chartTitleRenderer = Tempo.prepare("chart-title")
-	var legendsRenderer = Tempo.prepare("chart-legends")
+	// var legendsRenderer = Tempo.prepare("chart-legends")
 	var execTimeRenderer = Tempo.prepare("execution-time")
 	var errorRenderer = Tempo.prepare("error")
 
 	var paperWidth = document.getElementById("chart").offsetWidth
 	var paperHeight = Math.floor(paperWidth * 0.5)
-	var paper = Raphael(document.getElementById("chart"), paperWidth, paperHeight)
+	// var paper = Raphael(document.getElementById("chart"), paperWidth, paperHeight)
 
-	function legends(states)
-	{
-		var result = []
-		for (var i in states) {
-			var hsb = Raphael.g.colors[i].match(/(\d*\.\d+)/g) //"hsb(h, s, b)" -> [h, s, b]
-			var rgb = Raphael.hsb2rgb(hsb[0], hsb[1], hsb[2])
-			result.push({state: states[i], color: rgb.hex})
-		}
-		return result
-	}
+	// function legends(states)
+	// {
+	// 	var result = []
+	// 	for (var i in states) {
+	// 		var hsb = Raphael.g.colors[i].match(/(\d*\.\d+)/g) //"hsb(h, s, b)" -> [h, s, b]
+	// 		var rgb = Raphael.hsb2rgb(hsb[0], hsb[1], hsb[2])
+	// 		result.push({state: states[i], color: rgb.hex})
+	// 	}
+	// 	return result
+	// }
 
 
 	function displaySummary(json, executionTime)
@@ -38,35 +38,40 @@ window.onload = function () {
 
 	function displayChart(json, n)
 	{
-		var ageMax = 150
-
-		var result = JSON.parse(json)
-
-		var xs = []
+	    var ageMax = 150;
+	    var result = JSON.parse(json);
+	    var myData = [];
+	    
+	    for (var state in result) {
+		var freqs = result[state].map(function (x) { return x / n })
+		var localData = [];
 		for (var i = 0; i <= ageMax; i++) {
-			xs.push(i)
+		    localData.push({x:i,y:freqs[i]});
 		}
-		
-		var ys = []
-		var states = []
-		for (var state in result) {
-			var freqs = result[state].map(function (x) { return x / n })
-			var slicedFreqs = freqs.slice(0, ageMax + 1)
-			ys.push(slicedFreqs)
-			states.push(state)
-		}
+		myData.push({key: state, values: localData});
+	    }
 
-		chartTitleRenderer.render([["Estimated probability per age"]])
-		
-		paper.clear()
-		var left = 30
-		var top = 0
-		var w = paper.width - left - 1
-		var h = paper.height - 10
-		var opts = {axis: "0 0 1 1", axisxstep: 20, axisystep: 10}
-		paper.linechart(left, top, w, h, xs, ys, opts)
+	    chartTitleRenderer.render([["Estimated probability per age"]]);
 
-		legendsRenderer.render(legends(states))
+	    nv.addGraph(function() {
+		var chart = nv.models.lineChart()
+		    .color(d3.scale.category10().range())
+		    .x(function(d) { return d.x })
+                    .y(function(d) { return d.y }); 	
+
+		chart.xAxis
+		    .axisLabel("Age (years)");
+		
+		d3.select("#chart svg")
+		    .attr("width",500)
+		    .attr("height",300)
+		    .datum(myData)
+		    .transition().duration(500).call(chart);
+
+		nv.utils.windowResize( chart.update );
+
+		return chart;
+	    });
 	}
 
 
